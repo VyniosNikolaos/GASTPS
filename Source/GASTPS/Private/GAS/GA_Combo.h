@@ -1,0 +1,57 @@
+// VyniosNikolaos, Thesis, University of Patras, 2025
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GAS/GA_Base.h"
+#include "GA_Combo.generated.h"
+
+/**
+ * 
+ */
+UCLASS()
+class UGA_Combo : public UGA_Base
+{
+	GENERATED_BODY()
+
+public:
+	UGA_Combo();
+	
+	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+
+	static FGameplayTag GetComboChangeEventTag();
+	static FGameplayTag GetComboChangeEventEndTag();
+	static FGameplayTag GetComboTargetEventTag();
+
+
+private:
+	void SetupWaitComboInputPress();
+
+	UFUNCTION()
+	void HandleInputPress(float TimeWaited);
+
+	void TryCommitCombo();
+
+
+	UPROPERTY(EditDefaultsOnly, Category = "Gameplay Effect")
+	float TargetSweepSphereRadius=30.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Gameplay Effect")
+	TSubclassOf<UGameplayEffect> DefaultDamageEffect;
+	UPROPERTY(EditDefaultsOnly, Category = "Gameplay Effect")
+	TMap<FName, TSubclassOf<UGameplayEffect>> DamageEffectMap;
+
+	TSubclassOf<UGameplayEffect> GetDamageEffectForCurrentCombo() const;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	UAnimMontage* ComboMontage;
+
+	UFUNCTION()
+	void ComboChangeEventReceived(FGameplayEventData Data);
+
+	UFUNCTION()
+	void DoDamage(FGameplayEventData Data);
+
+	FName NextComboName;
+};
